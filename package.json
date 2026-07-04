@@ -1,0 +1,56 @@
+{
+  "name": "your-electron-app",
+  "version": "1.0.0",
+  "description": "Electron App",
+  "main": "electron/main.js",
+  "author": "",
+  "license": "MIT",
+  "private": true,
+
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+
+    "dist": "electron-builder",
+    "pack": "electron-builder --dir",
+
+    "release": "node scripts/release.js"
+  },
+
+  "build": {
+    "appId": "com.your.app",
+    "productName": "YourApp",
+
+    "asar": true,
+
+    "directories": {
+      "output": "dist"
+    },
+
+    "files": [
+      "electron/**/*",
+      "preload/**/*",
+      "renderer/**/*",
+      "package.json"
+    ],
+
+    "win": {
+      "target": "nsis"
+    },
+
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ]
+  },
+
+  "devDependencies": {
+    "electron": "^latest",
+    "electron-builder": "^latest"
+  },
+
+  "dependencies": {
+    "msgpackr": "^1.10.1"
+  }
+}

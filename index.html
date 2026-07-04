@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';">
+    <title>快捷启动器</title>
+    <!-- Tailwind CSS v3 (静态编译) -->
+    <link rel="stylesheet" href="vendor/tailwind.css">
+    <!-- Font Awesome (本地化) -->
+    <link href="vendor/font-awesome.min.css" rel="stylesheet">
+    <!-- 自定义样式 -->
+    <link href="style.css" rel="stylesheet">
+</head>
+<body class="bg-transparent text-text-primary">
+    <!-- 背景图片/视频容器 -->
+    <div id="bgImageContainer" class="bg-image-container"></div>
+    <!-- 主布局：顶部导航 + 侧栏 + 内容区 + 底部控制栏 -->
+    <div class="flex flex-col h-screen gap-1">
+        <!-- 顶部导航栏 -->
+        <header class="flex items-center justify-between px-6 py-3 border-2 border-gray-300 rounded-xl mx-1 mt-1 bg-white/70">
+            <div class="flex items-center space-x-8">
+                <div class="font-bold text-2xl"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M15.5 5h-4.991l-.565-.988A3 3 0 0 0 7.34 2.5H4.5a3 3 0 0 0-3 3V15a3 3 0 0 0 3 3h11a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3m-11 11a1 1 0 0 1-1-1V5.5a1 1 0 0 1 1-1h2.84a1 1 0 0 1 .868.504l.852 1.492A1 1 0 0 0 9.93 7h5.57a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1z" clip-rule="evenodd"></path></svg></div>
+                <div class="font-bold text-2xl">Play Game</div>
+            </div>
+            <!-- 搜索栏 -->
+            <div class="flex items-center flex-1 justify-center px-8">
+                <div class="relative w-full max-w-2xl flex items-center border-2 border-gray-300 rounded-xl bg-gray-100/80">
+                    <input type="text" id="searchInput" placeholder="" class="w-full py-2.5 px-4 focus:outline-none bg-transparent rounded-l-xl">
+                    <div class="w-1 h-8 bg-gray-400"></div>
+                    <button id="searchBtn" class="px-5 py-2 text-gray-600 flex items-center justify-center hover:bg-gray-200 rounded-r-xl">
+                        <i class="fa fa-search text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center">
+                <!-- 主题切换按钮（浅色/深色模式） -->
+                <button id="themeToggleBtn" class="w-12 h-12 flex items-center justify-center rounded-xl border-2 border-gray-300 hover:bg-gray-50">
+                    <!-- 太阳图标 - 浅色模式显示 -->
+                    <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 26 26" class="text-gray-700">
+                        <path fill="currentColor" d="M12.906-.031a1 1 0 0 0-.125.031A1 1 0 0 0 12 1v3a1 1 0 1 0 2 0V1a1 1 0 0 0-1.094-1.031M6.844 1.594a1 1 0 0 0-.719 1.5l1.5 2.625a1.008 1.008 0 0 0 1.75-1l-1.5-2.625a1 1 0 0 0-1.031-.5m11.968 0a1 1 0 0 0-.687.5l-1.5 2.625a1.008 1.008 0 0 0 1.75 1l1.5-2.625a1 1 0 0 0-.969-1.5a1 1 0 0 0-.093 0zm4.532 4.375A1 1 0 0 0 23.25 6a1 1 0 0 0-.344.125l-2.625 1.5a1.008 1.008 0 0 0 1 1.75l2.625-1.5a1 1 0 0 0-.562-1.906M2.437 6a1 1 0 0 0-.343 1.875l2.625 1.5a1.008 1.008 0 0 0 1-1.75l-2.625-1.5A1 1 0 0 0 2.438 6zM13 6a7 7 0 1 0 0 14a7 7 0 0 0 0-14m0 2c2.757 0 5 2.243 5 5s-2.243 5-5 5s-5-2.243-5-5s2.243-5 5-5M.719 12A1.004 1.004 0 0 0 1 14h3a1 1 0 1 0 0-2H1a1 1 0 0 0-.094 0a1.001 1.001 0 0 0-.093 0a1.004 1.004 0 0 0-.093 0m21 0A1.004 1.004 0 0 0 22 14h3a1 1 0 1 0 0-2h-3a1 1 0 0 0-.094 0a1.001 1.001 0 0 0-.093 0a1.004 1.004 0 0 0-.094 0M5.156 16.469a1 1 0 0 0-.093.031a1 1 0 0 0-.344.125l-2.625 1.5a1.008 1.008 0 0 0 1 1.75l2.625-1.5a1 1 0 0 0-.563-1.906m15.469.031a1 1 0 0 0-.344 1.875l2.625 1.5a1.008 1.008 0 0 0 1-1.75l-2.625-1.5a1 1 0 0 0-.656-.125M8.312 19.781a1 1 0 0 0-.687.5l-1.5 2.625a1.008 1.008 0 0 0 1.75 1l1.5-2.625a1 1 0 0 0-.969-1.5a1 1 0 0 0-.094 0m9.032 0a1 1 0 0 0-.719 1.5l1.5 2.625a1.008 1.008 0 0 0 1.75-1l1.5-2.625a1 1 0 0 0-1.031-.5m-4.438 1.188a1 1 0 0 0-.125.031A1 1 0 0 0 12 22v3a1 1 0 1 0 2 0v-3a1 1 0 0 0-1.094-1.031"></path>
+                    </svg>
+                    <!-- 月亮图标 - 深色模式显示 -->
+                    <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 16 16" class="text-gray-700 hidden">
+                        <path fill="currentColor" d="M6 .278a.77.77 0 0 1 .08.858a7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316a.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71C0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29c0-1.167.242-2.278.681-3.286"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <div class="flex flex-1 overflow-hidden gap-1 mx-1">
+            <!-- 左侧分类面板 -->
+            <aside id="sidebar" class="border-2 border-gray-300 rounded-xl bg-white/70 flex flex-col" style="width: 224px; height: calc(100% - 4px);">
+                <div class="p-2 flex-1 flex flex-col">
+                    <!-- 顶部按钮行容器 - 包含按钮和展开状态的分割线 -->
+                    <div id="sidebarTopRow" class="flex flex-col mb-2 px-1">
+                        <!-- 添加分类和收起侧栏按钮 -->
+                        <div class="flex items-center justify-between">
+                            <button id="addCategoryBtn" class="text-base text-gray-700 flex items-center justify-center border-2 border-gray-300 rounded-xl px-3 py-2 hover:bg-gray-50">
+                                <i class="fa fa-plus mr-1.5"></i>
+                                <span>添加分类</span>
+                            </button>
+                            <button id="collapseSidebarBtn" class="text-base text-gray-700 border-2 border-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-50" style="width: 60px; height: 44px;">
+                                <i class="fa fa-chevron-left text-xl"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- 展开状态顶部分割线 -->
+                        <div id="sidebarTopDividerExpanded" class="border-t-2 border-gray-300 my-2 mx-0"></div>
+                    </div>
+                    
+                    <!-- 收起按钮 - 仅在收起状态显示 -->
+                    <button id="expandSidebarBtn" class="hidden text-base text-gray-700 border-2 border-gray-300 rounded-xl flex items-center justify-center hover:bg-gray-50 mx-auto mb-2" style="width: 60px; height: 44px;">
+                        <i class="fa fa-chevron-right text-xl"></i>
+                    </button>
+                    
+                    <!-- 收起状态顶部分割线 - 独立容器，在收起状态显示 -->
+                    <div id="sidebarTopDividerCollapsed" class="border-t-2 border-gray-300 mb-2 mx-1 hidden"></div>
+                    
+                    <!-- 分类列表容器 -->
+                    <div class="flex-1 flex flex-col min-h-0" style="max-height: calc(100vh - 280px);">
+                        <!-- 展开状态分类列表 -->
+                        <div class="space-y-2 flex-1 overflow-y-auto px-2 scrollbar-thin" id="categoriesListExpanded">
+                            <!-- 分类列表将通过JavaScript动态生成 -->
+                        </div>
+                        
+                        <!-- 收起状态分类列表 -->
+                        <div class="space-y-2 flex-1 overflow-y-auto px-2 hidden scrollbar-thin" id="categoriesListCollapsed">
+                            <!-- 分类列表将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 底部按钮 - 仅在收起状态显示 -->
+                    <div id="sidebarBottomButtons" class="hidden space-y-2 px-1">
+                        <!-- 按钮之间的分割线 -->
+                        <div class="border-t-2 border-gray-300 mb-2"></div>
+                        
+                        <!-- 添加分类按钮 -->
+                        <button id="addCategoryBtnCollapsed" class="text-gray-700 flex items-center justify-center border-2 border-gray-300 rounded-xl hover:bg-gray-50 mx-auto" style="width: 60px; height: 44px;">
+                            <i class="fa fa-plus text-xl"></i>
+                        </button>
+                        
+                        <!-- 按钮之间的分割线 -->
+                        <div class="border-t-2 border-gray-300 mt-2 mb-2"></div>
+                        
+                        <!-- 设置按钮 - 收起状态 -->
+                        <button id="sidebarSettingsBtnCollapsed" class="flex items-center justify-center text-gray-700 border-2 border-gray-300 rounded-xl hover:bg-gray-50 mx-auto" style="width: 60px; height: 44px;">
+                            <i class="fa fa-cog text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 底部设置按钮区域（仅展开状态） -->
+                <div id="sidebarBottomExpanded" class="py-2 px-2">
+                    <div class="border-t-2 border-gray-300 mb-2"></div>
+                    <button id="sidebarSettingsBtn" class="flex items-center justify-center space-x-2 text-base text-gray-700 w-full rounded-xl hover:bg-gray-50 border-2 border-gray-300" style="height: 44px;">
+                        <i class="fa fa-cog text-xl"></i>
+                        <span>设置</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- 右侧内容区域 -->
+            <div class="flex-1 flex flex-col h-full gap-1">
+                <main id="appCardsContainer" class="flex-1 p-6 overflow-y-auto overflow-x-hidden relative bg-gray-100/80 border-2 border-gray-300 rounded-xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center">
+                            <span id="currentCategoryName" class="text-2xl font-semibold">默认分类</span>
+                        </div>
+                        <div class="flex items-center">
+                            <!-- 网格/列表视图切换 -->
+                            <div class="flex border-2 border-gray-300 rounded-xl bg-white overflow-hidden">
+                                <button id="gridViewBtn" class="w-12 h-11 flex items-center justify-center bg-gray-700 text-white border-r-2 border-gray-300">
+                                    <i class="fa fa-th-large text-lg"></i>
+                                </button>
+                                <button id="listViewBtn" class="w-12 h-11 flex items-center justify-center bg-white text-gray-400 cursor-not-allowed opacity-50">
+                                    <i class="fa fa-th-list text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 应用网格 -->
+                    <div id="appsGrid">
+                        <!-- 应用卡片将通过JavaScript动态生成 -->
+                    </div>
+                    
+                    <!-- 悬浮添加应用按钮 -->
+                    <button id="floatingAddBtn" class="fixed bottom-24 right-8 w-16 h-16 rounded-xl bg-gray-800 text-white shadow-lg hover:bg-gray-700 hover:shadow-xl transition-all flex items-center justify-center z-50 hidden">
+                        <i class="fa fa-plus text-3xl"></i>
+                    </button>
+                </main>
+
+                <!-- 底部控制栏 -->
+                <footer class="flex items-center justify-between px-8 py-3 border-2 border-gray-300 rounded-xl bg-white/70 mb-1">
+                    <!-- 分页导航 -->
+                    <div class="flex items-center space-x-4 flex-1 justify-center">
+                        <button id="prevPageBtn" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-50">
+                            <i class="fa fa-chevron-left text-2xl text-gray-400"></i>
+                        </button>
+                        <span id="pageInfo" class="text-xl font-medium">1/1</span>
+                        <button id="nextPageBtn" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-50">
+                            <i class="fa fa-chevron-right text-2xl text-gray-700"></i>
+                        </button>
+                    </div>
+                    <div class="text-base">
+                        当前应用总数：<span id="totalApps">0</span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置模态框 -->
+    <div id="settingsModal" class="modal-overlay hidden p-4 sm:p-6">
+        <div class="modal-content">
+            <div class="flex flex-col p-5 border-b border-gray-200 flex-shrink-0">
+                <div class="flex items-center justify-between w-full mb-3">
+                    <h3 class="font-bold text-xl text-gray-800" id="settingsModalTitle">设置</h3>
+                    <button id="closeSettingsModalBtn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors">
+                        <i class="fa fa-times text-lg"></i>
+                    </button>
+                </div>
+                <!-- 分页导航 -->
+                <div class="flex items-center gap-2">
+                    <div class="segmented-control inline-flex bg-gray-100 rounded-lg p-1">
+                        <button id="settingsPage1Btn" class="segmented-segment px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 bg-white text-gray-800 shadow-sm">设置</button>
+                        <button id="settingsPage2Btn" class="segmented-segment px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 text-gray-500 hover:text-gray-700">样式设置</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-scroll-area">
+                <!-- 第一页内容 -->
+                <div id="settingsPage1" class="p-5">
+                    <!-- 自定义背景 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">自定义背景</label>
+                        <div class="flex flex-col gap-2">
+                            <div id="bgPreview" class="w-full h-48 bg-gray-100 rounded-xl border-2 border-gray-300 flex items-center justify-center bg-cover bg-center bg-no-repeat overflow-hidden">
+                                <span id="bgPreviewPlaceholder" class="text-gray-400 text-sm">背景预览</span>
+                            </div>
+                            <div class="flex gap-2 justify-between items-center">
+                                <!-- 左侧：功能开关 -->
+                                <div class="flex items-center gap-4">
+                                    <!-- 动态背景播放/暂停开关 -->
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-gray-500 whitespace-nowrap">背景动态</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="bgVideoPlayToggle" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                                        </label>
+                                    </div>
+                                    <!-- 声音开关 -->
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-gray-500 whitespace-nowrap">背景声音</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="bgVideoMuteToggle" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- 右侧：上传/删除按钮 -->
+                                <div class="flex gap-2">
+                                    <button id="uploadBgBtn" class="px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors flex items-center">
+                                        <i class="fa fa-upload mr-2"></i>上传
+                                    </button>
+                                    <input type="file" id="uploadBgInput" class="hidden" accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.mp4,.webm">
+                                    <button id="deleteBgBtn" class="px-4 py-2 bg-red-50 text-red-700 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors flex items-center">
+                                        <i class="fa fa-trash mr-2"></i>删除
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 背景重复模式 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">背景重复模式</label>
+                        <div class="flex gap-2">
+                            <button id="bgModeFill" class="flex-1 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors border-2 border-blue-500">填充</button>
+                            <button id="bgModeCover" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300">拉伸</button>
+                            <button id="bgModeRepeat" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300">平铺</button>
+                            <button id="bgModeContain" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300">居中</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 背景透明度 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">背景透明度</label>
+                        <div class="flex items-center gap-4">
+                            <input type="range" id="bgOpacitySlider" min="0" max="100" value="50" class="flex-1 accent-green-500">
+                            <span id="bgOpacityValue" class="text-sm font-medium text-gray-700 w-12 text-right">50%</span>
+                            <!-- 应用卡片背景跟随透明度开关 -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-500 whitespace-nowrap">卡片背景跟随</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="appCardBgFollowOpacity" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 配置文件路径 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">配置文件路径</label>
+                        <div class="flex flex-wrap gap-2">
+                            <input type="text" id="configPathInput" class="flex-1 min-w-[150px] border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="配置文件路径">
+                            <div class="flex gap-2">
+                                <button id="selectConfigBtn" class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors whitespace-nowrap">选择</button>
+                                <button id="openConfigBtn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors whitespace-nowrap">打开</button>
+                                <button id="resetConfigBtn" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors whitespace-nowrap">重置</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 边框颜色自定义 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">分类列表选中框颜色</label>
+                        <div class="flex gap-3 mb-4">
+                            <div class="border-color-option w-10 h-10 rounded-xl bg-red-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-red-500" data-color="border-red-500"></div>
+                            <div class="border-color-option w-10 h-10 rounded-xl bg-blue-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-blue-500" data-color="border-blue-500"></div>
+                            <div class="border-color-option w-10 h-10 rounded-xl bg-green-500 cursor-pointer ring-2 ring-offset-2 ring-green-500" data-color="border-green-500"></div>
+                            <div class="border-color-option w-10 h-10 rounded-xl bg-yellow-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-yellow-500" data-color="border-yellow-500"></div>
+                            <div class="border-color-option w-10 h-10 rounded-xl bg-purple-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-purple-500" data-color="border-purple-500"></div>
+                            <div class="border-color-option w-10 h-10 rounded-xl bg-pink-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-pink-500" data-color="border-pink-500"></div>
+                            <div class="border-color-option w-10 h-10 rounded-xl bg-indigo-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-indigo-500" data-color="border-indigo-500"></div>
+                            <div class="border-color-option w-10 h-10 rounded-xl bg-gray-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-gray-500" data-color="border-gray-500"></div>
+                        </div>
+                        
+                        <!-- 16进制颜色输入框 -->
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-2 font-medium">16进制颜色</label>
+                            <div class="flex items-center gap-3">
+                                <input type="text" id="hexInput2" class="flex-1 border border-gray-200 rounded-lg px-4 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" value="#22c55e" placeholder="#000000">
+                                <div id="hexPreview" class="w-8 h-8 rounded-lg border-2 border-gray-200 bg-green-500"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 配置文件操作 -->
+                    <div class="mb-8">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">配置文件操作</label>
+                        <div class="flex gap-3">
+                            <button id="importConfigBtn" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                <i class="fa fa-download mr-2"></i>导入
+                            </button>
+                            <input type="file" id="importConfigInput" class="hidden" accept=".json">
+                            <button id="exportConfigBtn" class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                                <i class="fa fa-upload mr-2"></i>导出
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 第二页内容 -->
+                <div id="settingsPage2" class="p-5 hidden">
+                    
+                    <!-- 字体深浅模式切换 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">字体深浅模式</label>
+                        <div class="flex gap-2">
+                            <button id="fontFollowGlobal" class="flex-1 px-3 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors border-2 border-gray-300 style-setting-btn style-setting-btn-active">跟随全局</button>
+                            <button id="fontLightMode" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300 style-setting-btn">浅色模式</button>
+                            <button id="fontDarkMode" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300 style-setting-btn">深色模式</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 图标深浅模式切换 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">图标深浅模式</label>
+                        <div class="flex gap-2">
+                            <button id="iconFollowGlobal" class="flex-1 px-3 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors border-2 border-gray-300 style-setting-btn style-setting-btn-active">跟随全局</button>
+                            <button id="iconLightMode" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300 style-setting-btn">浅色模式</button>
+                            <button id="iconDarkMode" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300 style-setting-btn">深色模式</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 边框深浅模式切换 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">边框深浅模式</label>
+                        <div class="flex gap-2">
+                            <button id="borderFollowGlobal" class="flex-1 px-3 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors border-2 border-gray-300 style-setting-btn style-setting-btn-active">跟随全局</button>
+                            <button id="borderLightMode" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300 style-setting-btn">浅色模式</button>
+                            <button id="borderDarkMode" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300 style-setting-btn">深色模式</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 应用描述显示 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">应用描述显示</label>
+                        <div class="flex gap-2">
+                            <button id="descShowDefault" class="flex-1 px-3 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors border-2 border-gray-300 style-setting-btn style-setting-btn-active">默认显示</button>
+                            <button id="descHideWhenEmpty" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300 style-setting-btn">无描述时隐藏</button>
+                            <button id="descHideDefault" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300 style-setting-btn">默认隐藏</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 应用启动方式 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">应用启动方式</label>
+                        <div class="flex gap-2">
+                            <button id="launchClick" class="flex-1 px-3 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors border-2 border-gray-300 style-setting-btn style-setting-btn-active">点击启动</button>
+                            <button id="launchDblclick" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300 style-setting-btn">双击启动</button>
+                            <button id="launchIcon" class="flex-1 px-3 py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors border-2 border-gray-300 style-setting-btn">启动图标启动</button>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">选择"双击启动"时，单击卡片仅选中；选择"启动图标启动"时，仅点击卡片上的启动图标触发启动。</p>
+                    </div>
+
+                </div>
+            </div>
+            <!-- 底部按钮 -->
+            <div class="flex gap-3 p-5 border-t border-gray-100 flex-shrink-0">
+                <button id="cancelSettingsBtn" class="flex-1 px-5 py-2.5 border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors">取消</button>
+                <button id="confirmSettingsBtn" class="flex-1 px-5 py-2.5 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors shadow-lg shadow-green-500/25">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分类设置模态框 -->
+    <div id="categorySettingsModal" class="modal-overlay hidden p-4 sm:p-6">
+        <div class="modal-content">
+            <div class="flex items-center justify-between p-5 border-b border-gray-200 flex-shrink-0">
+                <h3 id="categorySettingsModalTitle" class="font-bold text-xl text-gray-800">分类设置</h3>
+                <button id="closeCategorySettingsModalBtn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors">
+                    <i class="fa fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="modal-scroll-area">
+                <div class="p-5">
+                    <!-- 分类名称 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">分类名称</label>
+                        <input type="text" id="categorySettingsName" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="请输入分类名称">
+                    </div>
+                    
+                    <!-- 分类颜色和图标 -->
+                    <div class="space-y-6 mb-8">
+                        <!-- 第一行：颜色选择区 -->
+                        <div class="grid grid-cols-2 gap-6 items-stretch">
+                            <!-- 左侧：预设颜色 + 16进制颜色 -->
+                            <div class="space-y-6">
+                                <!-- 预设颜色 -->
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-3 font-medium">分类颜色</label>
+                                    <div class="grid grid-cols-4 gap-3 mb-3">
+                                        <div class="color-option w-10 h-10 rounded-full bg-red-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-red-400" data-color="bg-red-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-blue-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-blue-400" data-color="bg-blue-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-green-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-green-400" data-color="bg-green-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-yellow-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-yellow-400" data-color="bg-yellow-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-purple-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-purple-400" data-color="bg-purple-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-pink-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-pink-400" data-color="bg-pink-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-indigo-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-indigo-400" data-color="bg-indigo-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-gray-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-gray-400" data-color="bg-gray-500"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 自定义颜色输入 - 16进制 -->
+                                <div class="pt-4 border-t border-gray-200">
+                                    <div>
+                                        <label class="block text-xl font-bold text-gray-800 mb-3">16进制颜色</label>
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <input type="text" id="categorySettingsHexColor" class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-mono bg-white" placeholder="000000" style="width: 120px;">
+                                            <div id="categorySettingsHexPreview" class="w-12 h-12 rounded-xl border-2 border-gray-300 flex-shrink-0 shadow-sm" style="background-color: black;"></div>
+                                        </div>
+                                        <button id="categorySettingsHexUseBtn" class="w-full px-6 py-2 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors bg-white">使用</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 右侧：RGB颜色 -->
+                            <div class="flex flex-col">
+                                <!-- RGB颜色 -->
+                                <div class="flex flex-col h-full">
+                                    <label class="block text-lg font-bold text-gray-800 mb-2">RGB颜色</label>
+                                    <div class="flex gap-4 mb-2">
+                                        <div class="flex flex-col gap-2">
+                                            <div class="flex flex-col gap-1">
+                                                <label class="text-xs text-gray-600 font-medium">R</label>
+                                                <input type="number" id="categorySettingsR" min="0" max="255" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-center bg-white" placeholder="0~255" style="width: 100px;">
+                                            </div>
+                                            <div class="flex flex-col gap-1">
+                                                <label class="text-xs text-gray-600 font-medium">G</label>
+                                                <input type="number" id="categorySettingsG" min="0" max="255" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-center bg-white" placeholder="0~255" style="width: 100px;">
+                                            </div>
+                                            <div class="flex flex-col gap-1">
+                                                <label class="text-xs text-gray-600 font-medium">B</label>
+                                                <input type="number" id="categorySettingsB" min="0" max="255" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-center bg-white" placeholder="0~255" style="width: 100px;">
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col pt-8 justify-between items-end">
+                                            <input type="color" id="categorySettingsColorWheel" value="#68d391" style="width: 64px; height: 64px;">
+                                            <div id="categorySettingsRgbPreview" class="w-12 h-12 rounded-xl border-2 border-gray-300 flex-shrink-0 shadow-sm" style="background-color: #68d391;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3 mt-auto">
+                                        <button id="categorySettingsRgbUseBtn" class="w-full px-6 py-2 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors bg-white">使用</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 中间分割线 -->
+                        <div class="border-t border-gray-200"></div>
+                        
+                        <!-- 第二行：图标选择区 -->
+                        <div class="grid grid-cols-2 gap-6">
+                            <!-- 左侧：分类图标 -->
+                            <div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-3 font-medium">分类图标</label>
+                                    <div class="grid grid-cols-5 gap-2 mb-3" id="categorySettingsIcons">
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-th-large">
+                                            <i class="fa fa-th-large"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-star">
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-heart">
+                                            <i class="fa fa-heart"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-home">
+                                            <i class="fa fa-home"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-gamepad">
+                                            <i class="fa fa-gamepad"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-music">
+                                            <i class="fa fa-music"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-film">
+                                            <i class="fa fa-film"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-book">
+                                            <i class="fa fa-book"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-coffee">
+                                            <i class="fa fa-coffee"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-cutlery">
+                                            <i class="fa fa-cutlery"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-shopping-cart">
+                                            <i class="fa fa-shopping-cart"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-folder">
+                                            <i class="fa fa-folder"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-image">
+                                            <i class="fa fa-image"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-video-camera">
+                                            <i class="fa fa-video-camera"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-camera">
+                                            <i class="fa fa-camera"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-code">
+                                            <i class="fa fa-code"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-terminal">
+                                            <i class="fa fa-terminal"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-desktop">
+                                            <i class="fa fa-desktop"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-laptop">
+                                            <i class="fa fa-laptop"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-cog">
+                                            <i class="fa fa-cog"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 右侧：自定义图标 -->
+                            <div>
+                                <div>
+                                    <label class="block text-sm text-gray-500 mb-1">自定义图标名/SVG</label>
+                                    <textarea id="categorySettingsCustomIcon" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="例如: fa-robot 或 SVG代码" rows="3"></textarea>
+                                    <div class="text-xs text-gray-400 mt-1">使用 Font Awesome 4.7 图标名 或 SVG代码</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 存储当前编辑的分类ID -->
+                    <input type="hidden" id="categorySettingsId" value="">
+                </div>
+            </div>
+            <!-- 底部按钮 -->
+            <div class="flex gap-3 p-5 border-t border-gray-100 flex-shrink-0">
+                <button id="cancelCategorySettingsBtn" class="flex-1 px-5 py-2.5 border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors">取消</button>
+                <button id="confirmCategorySettingsBtn" class="flex-1 px-5 py-2.5 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors shadow-lg shadow-green-500/25">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加分类模态框 -->
+    <div id="addCategoryModal" class="modal-overlay hidden p-4 sm:p-6">
+        <div class="modal-content">
+            <div class="flex items-center justify-between p-5 border-b border-gray-200 flex-shrink-0">
+                <h3 class="font-bold text-xl text-gray-800">添加分类</h3>
+                <button id="closeModalBtn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors">
+                    <i class="fa fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="modal-scroll-area">
+                <div class="p-5">
+                    <!-- 分类名称 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">分类名称</label>
+                        <input type="text" id="categoryName" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="请输入分类名称">
+                    </div>
+                    
+                    <!-- 分类颜色和图标 -->
+                    <div class="space-y-6 mb-8">
+                        <!-- 第一行：颜色选择区 -->
+                        <div class="grid grid-cols-2 gap-6 items-stretch">
+                            <!-- 左侧：预设颜色 + 16进制颜色 -->
+                            <div class="space-y-6">
+                                <!-- 预设颜色 -->
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-3 font-medium">分类颜色</label>
+                                    <div class="grid grid-cols-4 gap-3 mb-3">
+                                        <div class="color-option w-10 h-10 rounded-full bg-red-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-red-400" data-color="bg-red-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-blue-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-blue-400" data-color="bg-blue-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-green-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-green-400" data-color="bg-green-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-yellow-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-yellow-400" data-color="bg-yellow-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-purple-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-purple-400" data-color="bg-purple-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-pink-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-pink-400" data-color="bg-pink-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-indigo-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-indigo-400" data-color="bg-indigo-500"></div>
+                                        <div class="color-option w-10 h-10 rounded-full bg-gray-500 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-gray-400" data-color="bg-gray-500"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 自定义颜色输入 - 16进制 -->
+                                <div class="pt-4 border-t border-gray-200">
+                                    <div>
+                                        <label class="block text-xl font-bold text-gray-800 mb-3">16进制颜色</label>
+                                        <div class="flex items-center gap-3 mb-3">
+                                            <input type="text" id="addCategoryHexColor" class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 font-mono bg-white" placeholder="000000" style="width: 120px;">
+                                            <div id="addCategoryHexPreview" class="w-12 h-12 rounded-xl border-2 border-gray-300 flex-shrink-0 shadow-sm" style="background-color: black;"></div>
+                                        </div>
+                                        <button id="addCategoryHexUseBtn" class="w-full px-6 py-2 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors bg-white">使用</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 右侧：RGB颜色 -->
+                            <div class="flex flex-col">
+                                <!-- RGB颜色 -->
+                                <div class="flex flex-col h-full">
+                                    <label class="block text-lg font-bold text-gray-800 mb-2">RGB颜色</label>
+                                    <div class="flex gap-4 mb-2">
+                                        <div class="flex flex-col gap-2">
+                                            <div class="flex flex-col gap-1">
+                                                <label class="text-xs text-gray-600 font-medium">R</label>
+                                                <input type="number" id="addCategoryR" min="0" max="255" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-center bg-white" placeholder="0~255" style="width: 100px;">
+                                            </div>
+                                            <div class="flex flex-col gap-1">
+                                                <label class="text-xs text-gray-600 font-medium">G</label>
+                                                <input type="number" id="addCategoryG" min="0" max="255" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-center bg-white" placeholder="0~255" style="width: 100px;">
+                                            </div>
+                                            <div class="flex flex-col gap-1">
+                                                <label class="text-xs text-gray-600 font-medium">B</label>
+                                                <input type="number" id="addCategoryB" min="0" max="255" class="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-center bg-white" placeholder="0~255" style="width: 100px;">
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col pt-8 justify-between items-end">
+                                            <input type="color" id="addCategoryColorWheel" value="#68d391" style="width: 64px; height: 64px;">
+                                            <div id="addCategoryRgbPreview" class="w-12 h-12 rounded-xl border-2 border-gray-300 flex-shrink-0 shadow-sm" style="background-color: #68d391;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3 mt-auto">
+                                        <button id="addCategoryRgbUseBtn" class="w-full px-6 py-2 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors bg-white">使用</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 中间分割线 -->
+                        <div class="border-t border-gray-200"></div>
+                        
+                        <!-- 第二行：图标选择区 -->
+                        <div class="grid grid-cols-2 gap-6">
+                            <!-- 左侧：分类图标 -->
+                            <div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-3 font-medium">分类图标</label>
+                                    <div class="grid grid-cols-5 gap-2 mb-3">
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-th-large">
+                                            <i class="fa fa-th-large"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-star">
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-heart">
+                                            <i class="fa fa-heart"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-home">
+                                            <i class="fa fa-home"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-gamepad">
+                                            <i class="fa fa-gamepad"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-music">
+                                            <i class="fa fa-music"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-film">
+                                            <i class="fa fa-film"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-book">
+                                            <i class="fa fa-book"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-coffee">
+                                            <i class="fa fa-coffee"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-cutlery">
+                                            <i class="fa fa-cutlery"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-shopping-cart">
+                                            <i class="fa fa-shopping-cart"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-folder">
+                                            <i class="fa fa-folder"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-image">
+                                            <i class="fa fa-image"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-video-camera">
+                                            <i class="fa fa-video-camera"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-camera">
+                                            <i class="fa fa-camera"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-code">
+                                            <i class="fa fa-code"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-terminal">
+                                            <i class="fa fa-terminal"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-desktop">
+                                            <i class="fa fa-desktop"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-laptop">
+                                            <i class="fa fa-laptop"></i>
+                                        </div>
+                                        <div class="icon-option w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:bg-gray-100" data-icon="fa-cog">
+                                            <i class="fa fa-cog"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 右侧：自定义图标 -->
+                            <div>
+                                <div>
+                                    <label class="block text-sm text-gray-500 mb-1">自定义图标名/SVG</label>
+                                    <textarea id="customIconInput" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="例如: fa-robot 或 SVG代码" rows="3"></textarea>
+                                    <div class="text-xs text-gray-400 mt-1">使用 Font Awesome 4.7 图标名 或 SVG代码</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 底部按钮 -->
+            <div class="flex gap-3 p-5 border-t border-gray-100 flex-shrink-0">
+                <button id="cancelAddCategoryBtn" class="flex-1 px-5 py-2.5 border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors">取消</button>
+                <button id="confirmAddCategoryBtn" class="flex-1 px-5 py-2.5 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors shadow-lg shadow-green-500/25">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 应用设置模态框 -->
+    <div id="appSettingsModal" class="modal-overlay hidden p-4 sm:p-6">
+        <div class="modal-content">
+            <div class="flex items-center justify-between p-5 border-b border-gray-200 flex-shrink-0">
+                <h3 id="appSettingsModalTitle" class="font-bold text-xl text-gray-800">应用设置</h3>
+                <button id="closeAppSettingsModalBtn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors">
+                    <i class="fa fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="modal-scroll-area">
+                <div class="p-5">
+                    <!-- 应用名称 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">应用名称</label>
+                        <div class="flex items-center gap-3">
+                            <input type="text" id="appSettingsName" class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white" placeholder="请输入应用名称">
+                            <button id="appSettingsNameResetBtn" class="px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors bg-white whitespace-nowrap">重置</button>
+                        </div>
+                    </div>
+
+                    <!-- 应用路径 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">应用路径</label>
+                        <div class="flex items-start gap-3">
+                            <textarea id="appSettingsPath" class="w-3/5 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white resize-y min-h-[60px] max-h-[120px]" placeholder="请输入或选择应用路径" rows="2"></textarea>
+                            <button id="appSettingsPathBrowseBtn" class="px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors bg-white whitespace-nowrap">浏览</button>
+                            <button id="appSettingsPathChangeBtn" class="px-4 py-3 border-2 border-blue-500 bg-blue-50 text-blue-700 rounded-xl font-medium hover:bg-blue-100 transition-colors whitespace-nowrap">修改</button>
+                        </div>
+                        <input type="file" id="appSettingsPathInput" class="hidden" accept=".exe">
+                    </div>
+
+                    <!-- 应用描述 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">应用描述</label>
+                        <input type="text" id="appSettingsDescription" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white" placeholder="请输入应用描述">
+                    </div>
+
+                    <!-- 自定义图标和分类 -->
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <!-- 左侧：自定义图标 -->
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-3 font-medium">自定义图标</label>
+                            <div class="border-2 border-gray-300 rounded-xl p-2 bg-gray-100 flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors overflow-hidden" style="aspect-ratio: 1;" id="appSettingsIconPreviewContainer">
+                                <i id="appSettingsIconPreview" class="fa fa-image text-5xl text-gray-400"></i>
+                                <img id="appSettingsIconImage" class="hidden max-w-full max-h-full object-scale-down" style="image-rendering: pixelated; image-rendering: crisp-edges; background: transparent;" alt="应用图标">
+                            </div>
+                            <input type="file" id="appSettingsIconInput" class="hidden" accept=".png,.jpg,.jpeg,.gif,.apng,.svg,.webp">
+                        </div>
+
+                        <!-- 右侧：应用分类 -->
+                        <div class="flex flex-col">
+                            <label class="block text-sm text-gray-600 mb-3 font-medium">应用分类</label>
+                            <!-- 自定义下拉菜单 -->
+                            <div class="custom-dropdown" id="appSettingsCustomDropdown">
+                                <div class="custom-dropdown-trigger w-full border border-gray-300 rounded-xl px-4 py-3 text-sm bg-white cursor-pointer flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="custom-dropdown-value text-gray-700">选择分类</span>
+                                    <i class="fa fa-chevron-down text-gray-400 transition-transform"></i>
+                                </div>
+                                <div class="custom-dropdown-menu hidden absolute w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50" role="listbox">
+                                    <!-- 选项将通过JavaScript动态生成 -->
+                                </div>
+                                <input type="hidden" id="appSettingsCategory" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 底部按钮 -->
+            <div class="flex gap-3 p-5 border-t border-gray-200 flex-shrink-0">
+                <button id="cancelAppSettingsBtn" class="flex-1 px-5 py-2.5 border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors">取消</button>
+                <button id="confirmAppSettingsBtn" class="flex-1 px-5 py-2.5 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors shadow-lg shadow-green-500/25">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加应用模态框 -->
+    <div id="addAppModal" class="modal-overlay hidden p-4 sm:p-6">
+        <div class="modal-content">
+            <div class="flex items-center justify-between p-5 border-b border-gray-200 flex-shrink-0">
+                <h3 class="font-bold text-xl text-gray-800">添加应用</h3>
+                <button id="closeAddAppModalBtn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors">
+                    <i class="fa fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="modal-scroll-area">
+                <div class="p-5">
+                    <!-- 应用名称 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">应用名称</label>
+                        <div class="flex items-center gap-3">
+                            <input type="text" id="addAppName" class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white" placeholder="请输入应用名称">
+                            <button id="addAppNameResetBtn" class="px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors bg-white whitespace-nowrap">重置</button>
+                        </div>
+                    </div>
+
+                    <!-- 应用路径 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">应用路径</label>
+                        <div class="flex items-start gap-3">
+                            <textarea id="addAppPath" class="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white resize-y min-h-[60px] max-h-[120px]" placeholder="请输入或选择应用路径" rows="2"></textarea>
+                            <button id="addAppPathBrowseBtn" class="px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors bg-white whitespace-nowrap">浏览</button>
+                        </div>
+                        <input type="file" id="addAppPathInput" class="hidden" accept=".exe">
+                    </div>
+
+                    <!-- 应用描述 -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-600 mb-3 font-medium">应用描述</label>
+                        <input type="text" id="addAppDescription" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white" placeholder="请输入应用描述">
+                    </div>
+
+                    <!-- 自定义图标和分类 -->
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <!-- 左侧：自定义图标 -->
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-3 font-medium">自定义图标</label>
+                            <div class="border-2 border-gray-300 rounded-xl p-2 bg-gray-100 flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors overflow-hidden" style="aspect-ratio: 1;" id="addAppIconPreviewContainer">
+                                <i id="addAppIconPreview" class="fa fa-th-large text-5xl text-gray-400"></i>
+                                <img id="addAppIconImage" class="hidden max-w-full max-h-full object-scale-down" style="image-rendering: pixelated; image-rendering: crisp-edges; background: transparent;" alt="应用图标">
+                            </div>
+                            <input type="file" id="addAppIconInput" class="hidden" accept=".png,.jpg,.jpeg,.gif,.apng,.svg,.webp">
+                        </div>
+
+                        <!-- 右侧：应用分类 -->
+                        <div class="flex flex-col">
+                            <label class="block text-sm text-gray-600 mb-3 font-medium">应用分类</label>
+                            <!-- 自定义下拉菜单 -->
+                            <div class="custom-dropdown" id="addAppCustomDropdown">
+                                <div class="custom-dropdown-trigger w-full border border-gray-300 rounded-xl px-4 py-3 text-sm bg-white cursor-pointer flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                                    <span class="custom-dropdown-value text-gray-700">选择分类</span>
+                                    <i class="fa fa-chevron-down text-gray-400 transition-transform"></i>
+                                </div>
+                                <div class="custom-dropdown-menu hidden absolute w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50" role="listbox">
+                                    <!-- 选项将通过JavaScript动态生成 -->
+                                </div>
+                                <input type="hidden" id="addAppCategory" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 底部按钮 -->
+            <div class="flex gap-3 p-5 border-t border-gray-200 flex-shrink-0">
+                <button id="cancelAddAppBtn" class="flex-1 px-5 py-2.5 border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors">取消</button>
+                <button id="confirmAddAppBtn" class="flex-1 px-5 py-2.5 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors shadow-lg shadow-green-500/25">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg transform -translate-y-full transition-all duration-300 opacity-0 pointer-events-none z-[9999]">
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- JavaScript - 按依赖顺序加载 -->
+    <script src="script-core.js"></script>
+    <script src="script-ui.js"></script>
+    <script src="script-main.js"></script>
+</body>
+</html>

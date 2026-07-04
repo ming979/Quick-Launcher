@@ -1,0 +1,1660 @@
+
+/* 自定义工具类 - 使用标准CSS实现 */
+
+:root {
+    --container-opacity: 0.8;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease;
+}
+
+/* 主要容器过渡效果 */
+header, aside, footer, main {
+    transition: background-color 0.3s ease;
+}
+
+/* 使用CSS变量设置背景透明度 */
+header, aside, footer {
+    background-color: rgba(255, 255, 255, var(--container-opacity)) !important;
+}
+
+main {
+    background-color: rgba(243, 244, 246, var(--container-opacity)) !important;
+}
+
+/* 侧栏过渡动画 - Material Design 标准缓动曲线 */
+aside {
+    transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1), 
+                padding 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: width, padding;
+    backface-visibility: hidden;
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+}
+
+/* 侧栏收起状态宽度 */
+aside.sidebar-collapsed {
+    width: 96px !important; /* 缩小到96px */
+}
+
+/* 侧栏展开状态宽度 */
+aside:not(.sidebar-collapsed) {
+    width: 224px !important; /* w-56: 14rem = 224px */
+}
+
+/* 收起状态下的按钮容器过渡动画 */
+#sidebarBottomButtons {
+    transition: opacity 400ms cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 400ms cubic-bezier(0.4, 0, 0.2, 1), 
+                visibility 400ms ease-in-out;
+    will-change: opacity, transform, visibility;
+}
+
+/* 底部按钮容器 - 滑入动画 */
+#sidebarBottomButtons:not(.hidden) {
+    animation: bottomButtonsSlideIn 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* 底部按钮容器过渡动画 */
+#sidebarBottomExpanded {
+    transition: opacity 400ms cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 400ms cubic-bezier(0.4, 0, 0.2, 1), 
+                visibility 400ms ease-in-out;
+    will-change: opacity, transform, visibility;
+}
+
+/* 底部按钮容器 - 展开动画 */
+#sidebarBottomExpanded:not(.hidden) {
+    animation: bottomContainerSlideIn 450ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* 从左往右出现动画 - 用于底部按钮容器 */
+@keyframes bottomContainerSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-16px) scale(0.96);
+        clip-path: inset(0 100% 0 0);
+    }
+    60% {
+        clip-path: inset(0 0 0 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* 底部按钮 - 从左往右铺开效果 */
+#sidebarBottomButtons:not(.hidden),
+#sidebarBottomExpanded:not(.hidden) {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    visibility: visible;
+    clip-path: inset(0 0 0 0);
+    animation: bottomButtonsSlideIn 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes bottomButtonsSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px) scale(0.95);
+        clip-path: inset(0 100% 0 0);
+    }
+    70% {
+        clip-path: inset(0 0 0 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* 底部按钮隐藏时的过渡 */
+#sidebarBottomButtons.hidden,
+#sidebarBottomExpanded.hidden {
+    opacity: 0;
+    transform: translateX(-12px) scale(0.95);
+    visibility: hidden;
+    pointer-events: none;
+    clip-path: inset(0 80% 0 0);
+}
+
+/* 底部按钮悬停效果 */
+#sidebarBottomButtons button:hover,
+#sidebarBottomExpanded button:hover {
+    transition: transform 150ms ease-out, 
+                background-color 150ms ease-out;
+}
+
+
+
+/* ================================
+   分类按钮过渡动画
+   ================================ */
+
+/* 分类按钮入场动画 */
+@keyframes categorySlideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-12px) scale(0.95);
+        clip-path: inset(0 80% 0 0);
+    }
+    60% {
+        clip-path: inset(0 0 0 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+/* 分类按钮基础样式 - 初始隐藏状态 */
+#categoriesListExpanded > div,
+#categoriesListCollapsed > div {
+    opacity: 0;
+    transform: translateX(-12px) scale(0.95);
+    clip-path: inset(0 80% 0 0);
+    will-change: opacity, transform, clip-path;
+    backface-visibility: hidden;
+    overflow: hidden;
+}
+
+/* 分类按钮入场动画 - 添加 animate-in 类后触发 */
+#categoriesListExpanded > div.animate-in,
+#categoriesListCollapsed > div.animate-in {
+    animation: categorySlideIn 420ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* 分类按钮隐藏状态 */
+#categoriesListExpanded > div.hidden,
+#categoriesListCollapsed > div.hidden {
+    opacity: 0;
+    transform: translateX(-12px) scale(0.95);
+    visibility: hidden;
+    pointer-events: none;
+    clip-path: inset(0 80% 0 0);
+}
+
+/* 分类按钮悬停效果 */
+#categoriesListExpanded > div:hover,
+#categoriesListCollapsed > div:hover {
+    transition: transform 150ms ease-out, 
+                box-shadow 150ms ease-out;
+}
+
+/* 顶部按钮行过渡动画 - 使用底部设置按钮的动画 */
+#sidebarTopRow {
+    transition: opacity 420ms cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 420ms cubic-bezier(0.4, 0, 0.2, 1), 
+                visibility 420ms ease-in-out,
+                clip-path 420ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform, visibility, clip-path;
+    backface-visibility: hidden;
+    overflow: hidden;
+}
+
+/* 顶部按钮行 - 使用与底部设置按钮相同的动画 */
+#sidebarTopRow:not(.hidden) {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    visibility: visible;
+    clip-path: inset(0 0 0 0);
+    animation: bottomContainerSlideIn 450ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+#sidebarTopRow.hidden {
+    opacity: 0;
+    transform: translateX(-12px) scale(0.95);
+    visibility: hidden;
+    pointer-events: none;
+    clip-path: inset(0 80% 0 0);
+}
+
+/* 展开按钮过渡动画 - 从右往左出现 */
+#expandSidebarBtn {
+    transition: opacity 400ms cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 400ms cubic-bezier(0.4, 0, 0.2, 1), 
+                visibility 400ms ease-in-out,
+                clip-path 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform, visibility, clip-path;
+    backface-visibility: hidden;
+    overflow: hidden;
+}
+
+#expandSidebarBtn.hidden {
+    opacity: 0;
+    transform: translateX(-24px) scale(0.9);
+    visibility: hidden;
+    pointer-events: none;
+    clip-path: inset(0 0 0 100%);
+}
+
+#expandSidebarBtn:not(.hidden) {
+    animation: expandBtnSlideInRight 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes expandBtnSlideInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(-24px) scale(0.9);
+        clip-path: inset(0 0 0 100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+.app-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background-color: #ffffff;
+    cursor: pointer;
+    width: 160px;
+    height: 270px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/* 应用卡片透明度背景 - 最高优先级，覆盖所有其他样式
+ * 通过 body.app-card-bg-follow 容器类 + CSS 变量实现，无需逐卡加类
+ * app-card-override 类作为兼容保留（旧逻辑） */
+body.app-card-bg-follow .app-card:not(.add-app-card),
+body.dark-mode.app-card-bg-follow .app-card:not(.add-app-card),
+.app-card.app-card-override,
+body.dark-mode .app-card.app-card-override {
+    background-color: var(--app-card-opacity-bg, rgb(249, 249, 253)) !important;
+}
+
+/* 添加应用卡片 - 始终保持透明，图标居中 */
+.app-card.add-app-card,
+body.dark-mode .app-card.add-app-card {
+    background-color: transparent !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.app-card:hover {
+    border-color: #4CAF50;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 应用卡片底部操作按钮 - 形状贴合卡片底部圆角 */
+
+/* 按钮容器：抵消父元素的 padding，让按钮区域贴合卡片内边缘和底部 */
+.app-card .app-card-action-bar {
+    margin-left: -8px;
+    margin-right: -8px;
+    margin-bottom: -1px; /* 抵消父元素的 padding-bottom: 1px，让按钮底部到达卡片底部 border */
+}
+
+/* 按钮基础样式 - 统一过渡效果 */
+.app-card .app-settings-btn,
+.app-card .app-delete-btn {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    margin: 0;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    background-color: transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 设置按钮 - 左下圆角贴合卡片底部圆角（蓝色中性系）
+   卡片 border-radius: 12px，边框 2px，内部有效圆角 ≈ 10px */
+.app-card .app-settings-btn {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* 设置按钮悬停效果 - 蓝色系反馈，轻微阴影增强立体感 */
+.app-card .app-settings-btn:hover {
+    background-color: rgba(59, 130, 246, 0.28);
+    box-shadow: inset 0 2px 4px rgba(59, 130, 246, 0.22);
+}
+
+/* 设置按钮按下/激活状态 */
+.app-card .app-settings-btn:active {
+    background-color: rgba(59, 130, 246, 0.35);
+    box-shadow: inset 0 2px 6px rgba(59, 130, 246, 0.28);
+}
+
+/* 删除按钮 - 右下圆角贴合卡片底部圆角（红色警示系） */
+.app-card .app-delete-btn {
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* 删除按钮悬停效果 - 红色系反馈，明确警示感 */
+.app-card .app-delete-btn:hover {
+    background-color: rgba(239, 68, 68, 0.28);
+    box-shadow: inset 0 2px 4px rgba(239, 68, 68, 0.22);
+}
+
+/* 删除按钮按下/激活状态 */
+.app-card .app-delete-btn:active {
+    background-color: rgba(239, 68, 68, 0.35);
+    box-shadow: inset 0 2px 6px rgba(239, 68, 68, 0.28);
+}
+
+/* 深色模式下的按钮悬停样式 - 增强对比度 */
+body.dark-mode .app-card .app-settings-btn:hover {
+    background-color: rgba(96, 165, 250, 0.42);
+    box-shadow: inset 0 2px 4px rgba(96, 165, 250, 0.32);
+}
+
+body.dark-mode .app-card .app-settings-btn:active {
+    background-color: rgba(96, 165, 250, 0.48);
+}
+
+body.dark-mode .app-card .app-delete-btn:hover {
+    background-color: rgba(248, 113, 113, 0.42);
+    box-shadow: inset 0 2px 4px rgba(248, 113, 113, 0.32);
+}
+
+body.dark-mode .app-card .app-delete-btn:active {
+    background-color: rgba(248, 113, 113, 0.48);
+}
+
+/* 透明卡片模式下的按钮悬停 - 确保在任何背景上都清晰可见 */
+body.app-card-bg-follow .app-card .app-settings-btn:hover {
+    background-color: rgba(59, 130, 246, 0.15);
+}
+
+body.app-card-bg-follow .app-card .app-delete-btn:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+}
+
+/* ============================================
+   主栏应用卡片响应式布局 - Auto 自适应网格系统
+   - 卡片尺寸: 160px × 270px (固定)
+   - 卡片间距: 水平12px, 垂直32px
+   - 最多显示2行(分页由JavaScript控制)
+   - 根据容器宽度自动计算列数(auto-fit)
+   - 两种布局模式无缝共存：
+     1. 固定尺寸卡片：卡片保持预设尺寸
+     2. 自动换行布局：空间不足时自动换行
+   ============================================ */
+
+/* Auto 自适应网格 - 核心：auto-fit + minmax
+   根据容器宽度自动计算可容纳的列数
+   每列最小 160px（卡片宽度+边距安全值）
+   内容自动换行，永不溢出 */
+#appsGrid {
+    display: grid;
+    /* 固定160px列宽，尽可能多排列，剩余空间在右侧 */
+    grid-template-columns: repeat(auto-fill, 160px);
+    /* 整个网格从左开始排列，多余空间留在右侧 */
+    justify-content: start;
+    align-content: start;
+    column-gap: 40px;
+    row-gap: 32px;
+    padding: 0 8px;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+/* 小屏幕媒体查询：自动填充布局下，仅调整 padding
+   横向间距 column-gap 统一为 40px，不随屏幕宽度变化 */
+@media (max-width: 639px) {
+    #appsGrid {
+        padding: 0 4px;
+    }
+}
+
+/* 默认：横向间距 40px，纵向间距 32px（所有屏幕尺寸统一） */
+#appsGrid {
+    column-gap: 40px;
+    row-gap: 32px;
+}
+
+/* 卡片在网格列内居左对齐 - 水平方向靠网格居左，内部元素保留居中（卡片和日期都需要居中显示） */
+#appsGrid .app-card-wrapper {
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+/* 确保卡片尺寸不受网格列宽影响 */
+#appsGrid .app-card {
+    width: 160px;
+    max-width: 100%;
+}
+
+/* 模态框覆盖层 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+/* 模态框内容样式 */
+.modal-content {
+    background-color: #ffffff !important;
+    border-radius: 1rem;
+    border: 2px solid #d1d5db;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 28rem;
+    margin: 0 auto;
+    max-height: 670px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 确认弹窗样式 - 模仿原生 window.confirm() */
+.confirm-dialog-box {
+    background-color: #ffffff !important;
+    border-radius: 0.5rem;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 22rem;
+    margin: 0 1rem;
+    overflow: hidden;
+}
+
+/* 弹窗内容区域 */
+.confirm-dialog-body {
+    padding: 1.25rem 1.25rem 0.5rem 1.25rem;
+}
+
+/* 文字区域 */
+.confirm-dialog-text {
+    min-width: 0;
+}
+
+/* 弹窗标题 */
+.confirm-dialog-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.375rem 0;
+    line-height: 1.4;
+}
+
+/* 弹窗消息 */
+.confirm-dialog-message {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* 按钮区域 - 右对齐 */
+.confirm-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem 1rem 1.25rem;
+}
+
+/* 确认按钮 */
+.confirm-dialog-ok {
+    padding: 0.375rem 1.25rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #ffffff;
+    background-color: #3b82f6;
+    border: 1px solid #3b82f6;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    outline: none;
+}
+
+.confirm-dialog-ok:hover {
+    background-color: #2563eb;
+}
+
+.confirm-dialog-ok:active {
+    background-color: #1d4ed8;
+}
+
+/* 确认按钮 - 危险操作（红色） */
+.confirm-dialog-ok-danger {
+    background-color: #ef4444 !important;
+    border-color: #ef4444 !important;
+}
+
+.confirm-dialog-ok-danger:hover {
+    background-color: #dc2626 !important;
+}
+
+.confirm-dialog-ok-danger:active {
+    background-color: #b91c1c !important;
+}
+
+/* 取消按钮 */
+.confirm-dialog-cancel {
+    padding: 0.375rem 1.25rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #374151;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    outline: none;
+}
+
+.confirm-dialog-cancel:hover {
+    background-color: #f3f4f6;
+}
+
+.confirm-dialog-cancel:active {
+    background-color: #e5e7eb;
+}
+
+/* 背景模式按钮选中状态蓝色边框 */
+#bgModeFill.bg-blue-50,
+#bgModeCover.bg-blue-50,
+#bgModeRepeat.bg-blue-50,
+#bgModeContain.bg-blue-50 {
+    border-color: #3b82f6 !important;
+    border-width: 2px;
+}
+
+/* 背景模式按钮悬停 - 选中状态（蓝色系） */
+#bgModeFill.bg-blue-50:hover,
+#bgModeCover.bg-blue-50:hover,
+#bgModeRepeat.bg-blue-50:hover,
+#bgModeContain.bg-blue-50:hover {
+    background-color: #dbeafe !important;
+}
+
+/* 背景模式按钮悬停 - 未选中状态（灰色系） */
+#bgModeFill.bg-gray-50:hover,
+#bgModeCover.bg-gray-50:hover,
+#bgModeRepeat.bg-gray-50:hover,
+#bgModeContain.bg-gray-50:hover {
+    background-color: #e5e7eb !important;
+}
+
+/* 模态框滚动区域 */
+.modal-scroll-area {
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* 滚动条样式 */
+.modal-scroll-area::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-scroll-area::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+}
+
+.modal-scroll-area::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* 色轮样式 */
+input[type="color"] {
+    border-radius: 50% !important;
+    border: 2px solid #d1d5db !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0 !important;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none !important;
+    border-radius: 50% !important;
+}
+
+/* 深色模式 */
+body.dark-mode {
+    background-color: #1f2937;
+    color: #f3f4f6;
+}
+
+body.dark-mode header,
+body.dark-mode aside,
+body.dark-mode footer {
+    background-color: rgba(55, 65, 81, var(--container-opacity)) !important;
+    color: #f3f4f6;
+    transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1), 
+                padding 400ms cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.3s ease;
+}
+
+body.dark-mode main {
+    background-color: rgba(75, 85, 99, var(--container-opacity)) !important;
+    color: #f3f4f6;
+    transition: background-color 0.3s ease;
+}
+
+body.dark-mode .modal-content,
+body.dark-mode .confirm-dialog-box {
+    background-color: #374151 !important;
+    color: #f3f4f6;
+    border-color: #4b5563 !important;
+}
+
+/* 确认弹窗深色模式 */
+body.dark-mode .confirm-dialog-title {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .confirm-dialog-message {
+    color: #d1d5db !important;
+}
+
+body.dark-mode .confirm-dialog-cancel {
+    color: #d1d5db !important;
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode .confirm-dialog-cancel:hover {
+    background-color: #4b5563 !important;
+}
+
+body.dark-mode .confirm-dialog-ok {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
+body.dark-mode .confirm-dialog-ok:hover {
+    background-color: #2563eb !important;
+}
+
+body.dark-mode .confirm-dialog-ok-danger {
+    background-color: #dc2626 !important;
+    border-color: #dc2626 !important;
+}
+
+body.dark-mode .confirm-dialog-ok-danger:hover {
+    background-color: #b91c1c !important;
+}
+
+/* 深色模式搜索框样式 */
+body.dark-mode header .relative.w-full.max-w-2xl {
+    background-color: rgba(55, 65, 81, 0.8) !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode #searchInput {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode #searchBtn {
+    color: #9ca3af !important;
+}
+
+body.dark-mode #searchBtn:hover {
+    background-color: #4b5563 !important;
+}
+
+/* 深色模式弹窗内的文字和按钮样式 */
+body.dark-mode .modal-content .text-gray-600,
+body.dark-mode .modal-content .text-gray-700 {
+    color: #d1d5db !important;
+}
+
+body.dark-mode .modal-content .text-gray-500 {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .modal-content .bg-gray-50 {
+    background-color: #374151 !important;
+}
+
+body.dark-mode .modal-content .bg-gray-100 {
+    background-color: #4b5563 !important;
+}
+
+body.dark-mode .modal-content .bg-white {
+    background-color: #374151 !important;
+}
+
+body.dark-mode .modal-content .border-gray-200,
+body.dark-mode .modal-content .border-gray-300 {
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode .modal-content button {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .modal-content button:hover {
+    background-color: #4b5563 !important;
+}
+
+body.dark-mode .modal-content input,
+body.dark-mode .modal-content select,
+body.dark-mode .modal-content textarea {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .modal-content input:focus,
+body.dark-mode .modal-content select:focus,
+body.dark-mode .modal-content textarea:focus {
+    border-color: #60a5fa !important;
+    outline: none;
+}
+
+body.dark-mode .modal-content .hover\:bg-gray-50:hover {
+    background-color: #4b5563 !important;
+}
+
+body.dark-mode .modal-content .bg-blue-50 {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+body.dark-mode .modal-content .text-blue-700 {
+    color: #60a5fa !important;
+}
+
+body.dark-mode .modal-content .bg-green-50 {
+    background-color: rgba(34, 197, 94, 0.1) !important;
+}
+
+body.dark-mode .modal-content .text-green-700 {
+    color: #4ade80 !important;
+}
+
+body.dark-mode .modal-content .bg-red-50 {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+body.dark-mode .modal-content .text-red-700 {
+    color: #f87171 !important;
+}
+
+body.dark-mode .text-gray-700,
+body.dark-mode .text-gray-800 {
+    color: #f3f4f6;
+}
+
+body.dark-mode .border-gray-300 {
+    border-color: #4b5563;
+}
+
+body.dark-mode .bg-gray-100 {
+    background-color: #4b5563;
+}
+
+
+
+/* 应用卡片包装器 */
+.app-card-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 160px;
+    padding-top: 2px;
+    transition: all 0.3s ease;
+}
+
+/* 确保 flex 比例正确 */
+.app-card .flex-1 {
+    flex: 1;
+}
+
+/* 应用卡片日期元素 - 正常文档流，参与高度计算 */
+.app-card-date {
+    margin-top: 8px;
+    white-space: nowrap;
+    font-size: 11px;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* 深色模式 - 日期元素 */
+body.dark-mode .app-card-date {
+    color: #d1d5db;
+}
+
+/* 应用卡片深色模式 */
+body.dark-mode .app-card {
+    background-color: #374151;
+    border-color: #4b5563;
+}
+
+body.dark-mode .app-card .bg-gray-100 {
+    background-color: #4b5563;
+}
+
+body.dark-mode .app-card .border-gray-300 {
+    border-color: #4b5563;
+}
+
+body.dark-mode .hover\:bg-gray-50:hover {
+    background-color: #4b5563;
+}
+
+/* 深色模式下悬浮按钮样式 */
+body.dark-mode #floatingAddBtn {
+    background-color: #f3f4f6;
+    color: #1f2937;
+}
+
+body.dark-mode #floatingAddBtn:hover {
+    background-color: #e5e7eb;
+    box-shadow: 0 4px 16px rgba(243, 244, 246, 0.4);
+}
+
+body.dark-mode #floatingAddBtn i {
+    color: #1f2937;
+}
+
+/* 背景图片容器样式 */
+.bg-image-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity 0.3s ease;
+}
+
+
+
+/* ================================
+   自定义下拉菜单样式
+   ================================ */
+
+.custom-dropdown {
+    position: relative;
+}
+
+.custom-dropdown-trigger {
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.custom-dropdown-trigger.open {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.custom-dropdown-trigger.open .fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.custom-dropdown-trigger:hover {
+    border-color: #9ca3af;
+}
+
+.custom-dropdown-menu {
+    max-height: 144px;
+    overflow-y: auto;
+}
+
+.custom-dropdown-option {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.4;
+    transition: background-color 0.15s ease;
+    color: #374151;
+    user-select: none;
+}
+
+.custom-dropdown-option:hover {
+    background-color: #f3f4f6;
+}
+
+.custom-dropdown-option.selected {
+    background-color: #22c55e;
+    color: white;
+}
+
+.custom-dropdown-option.highlighted {
+    background-color: #dbeafe;
+}
+
+.custom-dropdown-option.selected.highlighted {
+    background-color: #16a34a;
+}
+
+/* 深色模式样式 */
+body.dark-mode .custom-dropdown-trigger {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #f3f4f6;
+}
+
+body.dark-mode .custom-dropdown-trigger .custom-dropdown-value {
+    color: #f3f4f6;
+}
+
+body.dark-mode .custom-dropdown-trigger:hover {
+    border-color: #6b7280;
+}
+
+body.dark-mode .custom-dropdown-trigger.open {
+    border-color: #22c55e;
+}
+
+/* main 的直接父容器（右侧内容区域 wrapper）：
+ * 显式提供可计算的高度约束，让子项 main 的 flex-1 + overflow-y:auto 真正生效，
+ * 只有在内容真的溢出父容器高度时才出现滚动条。
+ * 同时给 main 自身加上 min-height:0，防止 flex 子项被内容撑开不收缩 */
+body > div.flex-1 > div.flex-1.flex.flex-col.h-full,
+aside + div.flex-1.flex.flex-col.h-full {
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* 主内容区域 - 由父容器确定高度，内容真溢出时才滚动 */
+main {
+    overflow-x: hidden;
+    box-sizing: border-box;
+    min-height: 0;
+}
+
+/* 主内容区滚动条 - 细薄半透明，带悬停高亮 */
+main::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+main::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+    margin-block: 12px;
+}
+
+main::-webkit-scrollbar-thumb {
+    background-color: rgba(148, 163, 184, 0.5);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.2s ease;
+}
+
+main::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(100, 116, 139, 0.75);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+/* 深色模式 - 主内容区滚动条 */
+body.dark-mode main::-webkit-scrollbar-thumb {
+    background-color: rgba(148, 163, 184, 0.4);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+body.dark-mode main::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(203, 213, 225, 0.6);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+body.dark-mode .custom-dropdown-menu {
+    background-color: #374151;
+    border-color: #4b5563;
+}
+
+body.dark-mode .custom-dropdown-option {
+    color: #f3f4f6;
+}
+
+body.dark-mode .custom-dropdown-option:hover {
+    background-color: #4b5563;
+}
+
+body.dark-mode .custom-dropdown-option.selected {
+    background-color: #22c55e;
+}
+
+body.dark-mode .custom-dropdown-option.highlighted {
+    background-color: #1e40af;
+}
+
+body.dark-mode .custom-dropdown-option.selected.highlighted {
+    background-color: #16a34a;
+}
+
+/* 下拉菜单滚动条 */
+.custom-dropdown-menu::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-dropdown-menu::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+}
+
+.custom-dropdown-menu::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+body.dark-mode .custom-dropdown-menu::-webkit-scrollbar-thumb {
+    background-color: #6b7280;
+}
+
+/* ================================
+   细滚动条样式
+   ================================ */
+
+/* 细滚动条基础样式 */
+.scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+/* 深色模式细滚动条 */
+body.dark-mode .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #6b7280;
+}
+
+body.dark-mode .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+/* 分类列表容器滚动条样式 */
+#categoriesListExpanded::-webkit-scrollbar,
+#categoriesListCollapsed::-webkit-scrollbar {
+    width: 6px;
+}
+
+#categoriesListExpanded::-webkit-scrollbar-track,
+#categoriesListCollapsed::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#categoriesListExpanded::-webkit-scrollbar-thumb,
+#categoriesListCollapsed::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 3px;
+}
+
+#categoriesListExpanded::-webkit-scrollbar-thumb:hover,
+#categoriesListCollapsed::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+body.dark-mode #categoriesListExpanded::-webkit-scrollbar-thumb,
+body.dark-mode #categoriesListCollapsed::-webkit-scrollbar-thumb {
+    background-color: #6b7280;
+}
+
+body.dark-mode #categoriesListExpanded::-webkit-scrollbar-thumb:hover,
+body.dark-mode #categoriesListCollapsed::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+/* 确保模态框内输入框可以正常交互 */
+.modal-content input[type="text"],
+.modal-content input[type="number"],
+.modal-content input[type="email"],
+.modal-content textarea {
+    pointer-events: auto !important;
+    user-select: text !important;
+    cursor: text;
+}
+
+/* 确保flex布局正确 */
+.modal-scroll-area {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+/* 确保模态框内容不会被遮挡 */
+.modal-content > div:first-child {
+    flex-shrink: 0;
+}
+
+.modal-content > .modal-scroll-area {
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* 字体独立深浅模式样式 - 仅针对主要页面内容，不影响弹窗 */
+/* 排除 SVG 元素，SVG 颜色由图标模式控制 */
+body.font-light-mode main *:not(svg):not(svg *),
+body.font-light-mode header *:not(svg):not(svg *),
+body.font-light-mode aside *:not(svg):not(svg *),
+body.font-light-mode footer *:not(svg):not(svg *),
+body.font-light-mode #appCardsContainer *:not(svg):not(svg *),
+body.font-light-mode #sidebar *:not(svg):not(svg *) {
+    color: #1f2937 !important;
+}
+
+body.font-dark-mode main *:not(svg):not(svg *),
+body.font-dark-mode header *:not(svg):not(svg *),
+body.font-dark-mode aside *:not(svg):not(svg *),
+body.font-dark-mode footer *:not(svg):not(svg *),
+body.font-dark-mode #appCardsContainer *:not(svg):not(svg *),
+body.font-dark-mode #sidebar *:not(svg):not(svg *) {
+    color: #f3f4f6 !important;
+}
+
+/* 图标独立深浅模式样式 - 仅针对主要页面内容，不影响弹窗 */
+body.icon-light-mode main .fa,
+body.icon-light-mode main i,
+body.icon-light-mode header .fa,
+body.icon-light-mode header i,
+body.icon-light-mode aside .fa,
+body.icon-light-mode aside i,
+body.icon-light-mode footer .fa,
+body.icon-light-mode footer i,
+body.icon-light-mode #appCardsContainer .fa,
+body.icon-light-mode #appCardsContainer i,
+body.icon-light-mode #sidebar .fa,
+body.icon-light-mode #sidebar i {
+    color: #4b5563 !important;
+}
+
+body.icon-dark-mode main .fa,
+body.icon-dark-mode main i,
+body.icon-dark-mode header .fa,
+body.icon-dark-mode header i,
+body.icon-dark-mode aside .fa,
+body.icon-dark-mode aside i,
+body.icon-dark-mode footer .fa,
+body.icon-dark-mode footer i,
+body.icon-dark-mode #appCardsContainer .fa,
+body.icon-dark-mode #appCardsContainer i,
+body.icon-dark-mode #sidebar .fa,
+body.icon-dark-mode #sidebar i {
+    color: #d1d5db !important;
+}
+
+/* 边框独立深浅模式样式 - 覆盖所有边框颜色，包括顶栏、侧栏、主栏、底栏 */
+body.border-light-mode main *,
+body.border-light-mode header *,
+body.border-light-mode aside *,
+body.border-light-mode footer *,
+body.border-light-mode #appCardsContainer *,
+body.border-light-mode #sidebar * {
+    border-color: #d1d5db !important;
+}
+
+/* 背景容器平滑过渡效果 */
+#bgImageContainer {
+    transition: opacity 0.3s ease-in-out;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* 预览容器平滑过渡效果 */
+#bgPreview {
+    transition: opacity 0.3s ease-in-out;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+}
+
+body.border-dark-mode main *,
+body.border-dark-mode header *,
+body.border-dark-mode aside *,
+body.border-dark-mode footer *,
+body.border-dark-mode #appCardsContainer *,
+body.border-dark-mode #sidebar * {
+    border-color: #4b5563 !important;
+}
+
+/* 单独覆盖特定边框颜色类，确保所有边框都被正确处理 */
+body.border-light-mode .border-gray-100,
+body.border-light-mode .border-gray-200,
+body.border-light-mode .border-gray-300,
+body.border-light-mode .border-gray-400,
+body.border-light-mode .border-gray-500 {
+    border-color: #d1d5db !important;
+}
+
+body.border-dark-mode .border-gray-100,
+body.border-dark-mode .border-gray-200,
+body.border-dark-mode .border-gray-300,
+body.border-dark-mode .border-gray-400,
+body.border-dark-mode .border-gray-500 {
+    border-color: #4b5563 !important;
+}
+
+/* 确保弹窗和toast样式不受独立模式影响 - 关键重置规则 */
+body.font-light-mode .modal-overlay *,
+body.font-light-mode .modal-content *,
+body.font-dark-mode .modal-overlay *,
+body.font-dark-mode .modal-content *,
+body.icon-light-mode .modal-overlay *,
+body.icon-light-mode .modal-content *,
+body.icon-dark-mode .modal-overlay *,
+body.icon-dark-mode .modal-content *,
+body.border-light-mode .modal-overlay *,
+body.border-light-mode .modal-content *,
+body.border-dark-mode .modal-overlay *,
+body.border-dark-mode .modal-content *,
+body.font-light-mode #toast *,
+body.font-dark-mode #toast *,
+body.icon-light-mode #toast *,
+body.icon-dark-mode #toast *,
+body.border-light-mode #toast *,
+body.border-dark-mode #toast * {
+    color: inherit !important;
+    border-color: inherit !important;
+}
+
+/* 确保元素级样式优先级高于全局样式 */
+.font-light-mode,
+.font-dark-mode,
+.icon-light-mode,
+.icon-dark-mode,
+.border-light-mode,
+.border-dark-mode {
+    position: relative;
+    z-index: 1;
+}
+
+
+
+/* ============================================================
+   SVG 图标颜色规则（主题感知）
+   - 整体主题切换按钮图标：只跟随整体主题（body.dark-mode）
+   - 其他SVG图标：跟随图标类设置（icon-light-mode / icon-dark-mode）
+   ============================================================ */
+
+/* ---- 整体主题切换按钮的图标（太阳/月亮）- 只跟随整体主题，不受字体/图标模式影响 ---- */
+#sunIcon,
+#moonIcon,
+#themeToggleBtn svg {
+    fill: #374151 !important;
+    stroke: #374151 !important;
+    color: #374151 !important;
+}
+
+body.dark-mode #sunIcon,
+body.dark-mode #moonIcon,
+body.dark-mode #themeToggleBtn svg {
+    fill: #d1d5db !important;
+    stroke: #d1d5db !important;
+    color: #d1d5db !important;
+}
+
+/* ---- 其他 SVG 图标 - 跟随图标类设置（排除主题切换按钮） ---- */
+/* 默认亮色图标 */
+div[class*="flex"] svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+div[class*="category"] svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+button[class*="category"] svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+.w-8.h-8.flex svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+.w-6.h-6.flex svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+.flex svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon) {
+    fill: #1f2937 !important;
+    stroke: #1f2937 !important;
+    color: #1f2937 !important;
+}
+
+/* 图标类设置为亮色模式 */
+body.icon-light-mode div[class*="flex"] svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+body.icon-light-mode div[class*="category"] svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+body.icon-light-mode button[class*="category"] svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+body.icon-light-mode .w-8.h-8.flex svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+body.icon-light-mode .w-6.h-6.flex svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+body.icon-light-mode .flex svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon) {
+    fill: #4b5563 !important;
+    stroke: #4b5563 !important;
+    color: #4b5563 !important;
+}
+
+/* 图标类设置为暗色模式 */
+body.icon-dark-mode div[class*="flex"] svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+body.icon-dark-mode div[class*="category"] svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+body.icon-dark-mode button[class*="category"] svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+body.icon-dark-mode .w-8.h-8.flex svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+body.icon-dark-mode .w-6.h-6.flex svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon),
+body.icon-dark-mode .flex svg:not(#sunIcon):not(#moonIcon):not(.app-launch-icon) {
+    fill: #d1d5db !important;
+    stroke: #d1d5db !important;
+    color: #d1d5db !important;
+}
+
+/* ---- 分类按钮中的 SVG 图标 ---- */
+/* 默认亮色 */
+.category-icon svg,
+.category-icon svg * {
+    fill: #1f2937 !important;
+    stroke: #1f2937 !important;
+    color: #1f2937 !important;
+}
+
+/* 分类图标跟随图标类设置 */
+body.icon-light-mode .category-icon svg,
+body.icon-light-mode .category-icon svg * {
+    fill: #4b5563 !important;
+    stroke: #4b5563 !important;
+    color: #4b5563 !important;
+}
+
+body.icon-dark-mode .category-icon svg,
+body.icon-dark-mode .category-icon svg * {
+    fill: #d1d5db !important;
+    stroke: #d1d5db !important;
+    color: #d1d5db !important;
+}
+
+/* 分类按钮内的设置/删除图标悬停变色 */
+.settings-category-btn:hover i,
+.settings-category-btn:hover .fa {
+    color: #2563eb !important;
+}
+
+.delete-category-btn:hover i,
+.delete-category-btn:hover .fa {
+    color: #dc2626 !important;
+}
+
+body.dark-mode .settings-category-btn:hover i,
+body.dark-mode .settings-category-btn:hover .fa {
+    color: #60a5fa !important;
+}
+
+body.dark-mode .delete-category-btn:hover i,
+body.dark-mode .delete-category-btn:hover .fa {
+    color: #f87171 !important;
+}
+
+/* 设置弹窗分页按钮 - 基础样式（已废弃，改为 Segmented 控件） */
+.segmented-control {
+    transition: all 0.2s ease;
+}
+
+/* Segmented 控件 - 选中状态 */
+.segmented-segment-active {
+    background-color: #ffffff !important;
+    color: #1f2937 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.08) !important;
+    font-weight: 600 !important;
+}
+
+/* Segmented 控件 - 未选中状态 */
+.segmented-segment:not(.segmented-segment-active) {
+    color: #9ca3af !important;
+}
+
+.segmented-segment:not(.segmented-segment-active):hover {
+    color: #6b7280 !important;
+}
+
+/* 暗色模式 */
+body.dark-mode .segmented-control {
+    background-color: #374151 !important;
+}
+
+body.dark-mode .segmented-segment-active {
+    background-color: #4b5563 !important;
+    color: #f9fafb !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    font-weight: 600 !important;
+}
+
+body.dark-mode .segmented-segment:not(.segmented-segment-active) {
+    color: #6b7280 !important;
+}
+
+body.dark-mode .segmented-segment:not(.segmented-segment-active):hover {
+    color: #9ca3af !important;
+}
+
+/* 样式设置按钮 - 基础样式 */
+.style-setting-btn {
+    transition: all 0.2s ease;
+}
+
+/* 样式设置按钮 - 未选中状态 */
+.style-setting-btn:not(.style-setting-btn-active) {
+    border: 2px solid #d1d5db !important;
+    border-color: #d1d5db !important;
+    background-color: #f9fafb !important;
+    color: #374151 !important;
+}
+
+/* 样式设置按钮 - 选中状态 */
+.style-setting-btn.style-setting-btn-active,
+#settingsPage2 .style-setting-btn.style-setting-btn-active,
+#fontFollowGlobal.style-setting-btn-active,
+#iconFollowGlobal.style-setting-btn-active,
+#borderFollowGlobal.style-setting-btn-active,
+#fontLightMode.style-setting-btn-active,
+#iconLightMode.style-setting-btn-active,
+#borderLightMode.style-setting-btn-active,
+#fontDarkMode.style-setting-btn-active,
+#iconDarkMode.style-setting-btn-active,
+#borderDarkMode.style-setting-btn-active,
+#descShowDefault.style-setting-btn-active,
+#descHideWhenEmpty.style-setting-btn-active,
+#descHideDefault.style-setting-btn-active {
+    border: 2px solid #00C853 !important;
+    border-color: #00C853 !important;
+    border-width: 2px !important;
+    background-color: #ecfdf5 !important;
+    color: #059669 !important;
+    outline: none !important;
+}
+
+/* 深色模式下的样式设置按钮未选中状态 */
+body.dark-mode .style-setting-btn:not(.style-setting-btn-active) {
+    border: 2px solid #4b5563 !important;
+    border-color: #4b5563 !important;
+    background-color: #1f2937 !important;
+    color: #d1d5db !important;
+}
+
+/* 深色模式下的样式设置按钮选中状态 */
+body.dark-mode .style-setting-btn.style-setting-btn-active,
+body.dark-mode #settingsPage2 .style-setting-btn.style-setting-btn-active,
+body.dark-mode #fontFollowGlobal.style-setting-btn-active,
+body.dark-mode #iconFollowGlobal.style-setting-btn-active,
+body.dark-mode #borderFollowGlobal.style-setting-btn-active,
+body.dark-mode #fontLightMode.style-setting-btn-active,
+body.dark-mode #iconLightMode.style-setting-btn-active,
+body.dark-mode #borderLightMode.style-setting-btn-active,
+body.dark-mode #fontDarkMode.style-setting-btn-active,
+body.dark-mode #iconDarkMode.style-setting-btn-active,
+body.dark-mode #borderDarkMode.style-setting-btn-active,
+body.dark-mode #descShowDefault.style-setting-btn-active,
+body.dark-mode #descHideWhenEmpty.style-setting-btn-active,
+body.dark-mode #descHideDefault.style-setting-btn-active {
+    border: 2px solid #00C853 !important;
+    border-color: #00C853 !important;
+    border-width: 2px !important;
+    background-color: rgba(0, 200, 83, 0.2) !important;
+    color: #34d399 !important;
+    outline: none !important;
+}
+
+/* 应用卡片背景跟随透明度开关样式 */
+#appCardBgFollowOpacity + div {
+    transition: background-color 0.3s ease;
+}
+
+#appCardBgFollowOpacity + div::after {
+    transition: all 0.3s ease;
+}
+
+/* 深色模式下开关样式 */
+body.dark-mode #appCardBgFollowOpacity + div {
+    background-color: #4b5563 !important;
+}
+
+body.dark-mode #appCardBgFollowOpacity:checked + div {
+    background-color: #22c55e !important;
+}
+
+body.dark-mode #appCardBgFollowOpacity + div::after {
+    border-color: #6b7280 !important;
+}
+
+/* 深色模式下开关标签文字样式 */
+body.dark-mode label:has(#appCardBgFollowOpacity) + div span,
+body.dark-mode div:has(#appCardBgFollowOpacity) + div span {
+    color: #d1d5db !important;
+}
+
+/* 视图切换容器背景与活跃按钮一致，消除 overflow-hidden 圆角锯齿 */
+#gridViewBtn,
+body div:has(> #gridViewBtn) {
+    background-color: #374151 !important;
+}
+
+/* 背景视频播放/暂停开关和声音开关 - 深色模式 */
+body.dark-mode #bgVideoPlayToggle + div {
+    background-color: #4b5563 !important;
+}
+
+body.dark-mode #bgVideoPlayToggle:checked + div {
+    background-color: #22c55e !important;
+}
+
+body.dark-mode #bgVideoPlayToggle + div::after {
+    border-color: #6b7280 !important;
+}
+
+body.dark-mode #bgVideoMuteToggle + div {
+    background-color: #4b5563 !important;
+}
+
+body.dark-mode #bgVideoMuteToggle:checked + div {
+    background-color: #22c55e !important;
+}
+
+body.dark-mode #bgVideoMuteToggle + div::after {
+    border-color: #6b7280 !important;
+}
+
+/* 背景视频开关标签深色模式文字颜色 */
+body.dark-mode label:has(#bgVideoPlayToggle) ~ div span,
+body.dark-mode div:has(#bgVideoPlayToggle) + div span {
+    color: #d1d5db !important;
+}
+
+/* 修复：Font Awesome 的 .fa { display: inline-block } 会覆盖 Tailwind 的 .hidden { display: none } */
+.fa.hidden,
+.hidden.fa {
+    display: none !important;
+}
+
+/* 修复：Font Awesome 的 .fa { font-size: inherit } 会覆盖 Tailwind 的 text-* 类
+   （font-awesome.min.css 在 tailwind.css 之后加载，同优先级下后者覆盖前者）
+   同时修复 font 简写中的 line-height: 1 覆盖 Tailwind 的 line-height */
+.fa.text-xs { font-size: 0.75rem !important; line-height: 1rem !important; }
+.fa.text-sm { font-size: 0.875rem !important; line-height: 1.25rem !important; }
+.fa.text-base { font-size: 1rem !important; line-height: 1.5rem !important; }
+.fa.text-lg { font-size: 1.125rem !important; line-height: 1.75rem !important; }
+.fa.text-xl { font-size: 1.25rem !important; line-height: 1.75rem !important; }
+.fa.text-2xl { font-size: 1.5rem !important; line-height: 2rem !important; }
+.fa.text-3xl { font-size: 1.875rem !important; line-height: 2.25rem !important; }
+.fa.text-4xl { font-size: 2.25rem !important; line-height: 2.5rem !important; }
+.fa.text-5xl { font-size: 3rem !important; line-height: 1 !important; }
+.fa.text-6xl { font-size: 3.75rem !important; line-height: 1 !important; }
+.fa.text-7xl { font-size: 4.5rem !important; line-height: 1 !important; }
+.fa.text-8xl { font-size: 6rem !important; line-height: 1 !important; }
+.fa.text-9xl { font-size: 8rem !important; line-height: 1 !important; }
+
+/* ================================
+   启动图标播放按钮覆盖层样式
+   ================================ */
+
+/* 播放按钮容器 - 覆盖在图标区域居中 */
+.app-launch-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 0.75rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 5;
+}
+
+/* 图标容器悬停时显示播放覆盖层 */
+.app-icon-container:hover .app-launch-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 播放三角形图标（SVG） */
+.app-launch-icon {
+    width: 48px;
+    height: 48px;
+    color: #f3f4f6;
+    fill: currentColor !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transition: transform 0.15s ease;
+}
+
+.app-launch-overlay:hover .app-launch-icon {
+    transform: scale(1.15);
+}
+
+/* 深色模式下的播放图标 */
+body.dark-mode .app-launch-icon {
+    color: #f3f4f6;
+}
+
+
