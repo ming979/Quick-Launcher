@@ -555,7 +555,7 @@ function calculateItemsPerPage() {
     // 卡片高度约为 280px（含间距）
     const cardHeight = 280;
     const availableHeight = gridRect.height;
-    const rows = Math.max(1, Math.floor(availableHeight / cardHeight));
+    const rows = Math.max(2, Math.floor(availableHeight / cardHeight));
     return Math.max(1, cols * rows);
 }
 
