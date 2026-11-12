@@ -6,7 +6,6 @@
 ##  项目结构
 
 
-.
 ├── index.html # UI入口
 ├── main.js # Electron 主进程
 ├── preload.js # 安全桥接层
