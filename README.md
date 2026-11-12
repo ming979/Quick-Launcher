@@ -6,21 +6,21 @@
 ##  项目结构
 
 
-├── index.html # UI入口
-├── main.js # Electron 主进程
-├── preload.js # 安全桥接层
-├── script-core.js # 核心逻辑
-├── script-main.js # 主流程控制
-├── script-ui.js # UI交互逻辑
-├── style.css # 页面样式
-│
-├── vendor/ # 前端依赖（无需 npm）
-│ ├── tailwind.css
-│ ├── tailwind.min.js
-│ └── font-awesome 图标库
-│
-├── package.json
-├── package-lock.json
+── index.html # UI入口
+── main.js # Electron 主进程
+── preload.js # 安全桥接层
+── script-core.js # 核心逻辑
+── script-main.js # 主流程控制
+── script-ui.js # UI交互逻辑
+── style.css # 页面样式
+
+── vendor/ # 前端依赖（无需 npm）
+ ├── tailwind.css
+ ├── tailwind.min.js
+ └── font-awesome 图标库
+
+── package.json
+── package-lock.json
 
 
 ---
